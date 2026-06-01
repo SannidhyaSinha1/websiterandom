@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Luminary Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --accent: #c8472a;
+    --gold: #d4a843;
+    --muted: #7a7060;
+    --light: #ede8df;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: multiply;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.18s ease;
+    mix-blend-mode: multiply;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 2.5rem;
+    background: rgba(245,240,232,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(13,13,13,0.08);
+  }
+
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex; gap: 2rem; list-style: none;
+    align-items: center;
+  }
+
+  .nav-links a {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+  .nav-cta {
+    background: var(--ink);
+    color: var(--paper) !important;
+    padding: 0.55rem 1.3rem;
+    border-radius: 2px;
+    color: var(--paper);
+    transition: background 0.2s !important;
+  }
+  .nav-cta:hover { background: var(--accent) !important; color: var(--paper) !important; }
+
+  /* SECTIONS */
+  section { display: none; }
+  section.active { display: block; }
+
+  /* ========== HOME ========== */
+  #home {
+    min-height: 100vh;
+    padding-top: 70px;
+  }
+
+  .hero {
+    padding: 6rem 2.5rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: end;
+    min-height: calc(100vh - 70px);
+  }
+
+  .hero-left { padding-bottom: 3rem; }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.8rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 2rem; height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(3.2rem, 5vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    line-height: 1.75;
+    color: var(--muted);
+    max-width: 420px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--paper);
+    border: none;
+    padding: 1rem 2rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    border-radius: 2px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-primary:hover { background: #a63520; transform: translateY(-1px); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid rgba(13,13,13,0.3);
+    padding: 1rem 2rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: none;
+    border-radius: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--ink); color: var(--accent); border-color: var(--accent); }
+
+  .hero-right {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 3rem;
+  }
+
+  .hero-visual-main {
+    background: var(--ink);
+    height: 320px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .hero-visual-main::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(200,71,42,0.4) 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, rgba(212,168,67,0.25) 0%, transparent 50%);
+  }
+
+  .hero-visual-text {
+    position: relative; z-index: 1;
+    font-family: var(--serif);
+    font-size: 6rem;
+    font-weight: 900;
+    color: rgba(245,240,232,0.08);
+    letter-spacing: -0.05em;
+    user-select: none;
+  }
+
+  .hero-visual-badge {
+    position: absolute;
+    bottom: 1.5rem; right: 1.5rem;
+    background: var(--accent);
+    color: var(--paper);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .hero-visual-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+  }
+
+  .hero-card-small {
+    background: var(--light);
+    border: 1px solid rgba(13,13,13,0.1);
+    border-radius: 4px;
+    padding: 1.2rem;
+  }
+
+  .hero-card-small .num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .hero-card-small .label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+
+  .marquee-wrap {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .marquee-track {
+    display: inline-block;
+    animation: marquee 18s linear infinite;
+  }
+
+  .marquee-item {
+    display: inline-block;
+    padding: 0 2rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+
+  .marquee-item::after {
+    content: '✦';
+    margin-left: 2rem;
+    color: var(--accent);
+    opacity: 1;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Services on home */
+  .services-preview {
+    padding: 5rem 2.5rem;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(13,13,13,0.1);
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+
+  .service-card {
+    padding: 2.5rem;
+    border: 1px solid rgba(13,13,13,0.1);
+    border-right: none;
+    transition: background 0.3s;
+    cursor: none;
+  }
+
+  .service-card:last-child { border-right: 1px solid rgba(13,13,13,0.1); }
+  .service-card:hover { background: var(--ink); }
+  .service-card:hover .service-num, .service-card:hover .service-title, .service-card:hover .service-desc { color: var(--paper); }
+  .service-card:hover .service-num { color: var(--accent); }
+
+  .service-num {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    transition: color 0.3s;
+  }
+
+  .service-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+    line-height: 1.2;
+  }
+
+  .service-desc {
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+
+  /* ========== ABOUT ========== */
+  #about { padding-top: 70px; }
+
+  .about-hero {
+    padding: 6rem 2.5rem 4rem;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-hero::before {
+    content: 'LUMINARY';
+    position: absolute;
+    right: -2rem; bottom: -2rem;
+    font-family: var(--serif);
+    font-size: 12rem;
+    font-weight: 900;
+    color: rgba(245,240,232,0.04);
+    letter-spacing: -0.05em;
+    user-select: none;
+  }
+
+  .about-hero-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2rem;
+  }
+
+  .about-hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4.5vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    max-width: 700px;
+    margin-bottom: 3rem;
+  }
+
+  .about-hero-title em { font-style: italic; color: var(--gold); }
+
+  .about-intro-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    padding: 5rem 2.5rem;
+  }
+
+  .about-intro-left .big-text {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2vw, 1.8rem);
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .about-intro-right p {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .values-row {
+    padding: 0 2.5rem 5rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .value-item {
+    padding: 2rem 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  .value-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .value-title {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .value-desc {
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .team-section {
+    background: var(--light);
+    padding: 5rem 2.5rem;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    background: var(--paper);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .team-avatar {
+    height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif);
+    font-size: 4rem;
+    font-weight: 900;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .team-avatar.a1 { background: var(--ink); color: var(--accent); }
+  .team-avatar.a2 { background: var(--accent); color: var(--paper); }
+  .team-avatar.a3 { background: #2a3a2a; color: var(--gold); }
+
+  .team-info { padding: 1.5rem; }
+
+  .team-name {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .team-role {
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+
+  .team-bio {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  /* ========== SERVICES ========== */
+  #services { padding-top: 70px; }
+
+  .services-hero {
+    padding: 6rem 2.5rem 4rem;
+    display: grid;
+    grid-template-columns: 5fr 3fr;
+    gap: 4rem;
+    align-items: end;
+    border-bottom: 1px solid rgba(13,13,13,0.1);
+  }
+
+  .services-hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 900;
+    line-height: 1.05;
+  }
+
+  .services-hero-title em { font-style: italic; color: var(--accent); }
+
+  .services-hero-text {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+
+  .service-list {
+    padding: 0 2.5rem;
+  }
+
+  .service-row {
+    display: grid;
+    grid-template-columns: 80px 2fr 3fr 120px;
+    align-items: start;
+    gap: 2rem;
+    padding: 3rem 0;
+    border-bottom: 1px solid rgba(13,13,13,0.08);
+    transition: background 0.2s;
+    cursor: none;
+  }
+
+  .service-row:hover { background: var(--light); margin: 0 -2.5rem; padding-left: 2.5rem; padding-right: 2.5rem; }
+
+  .service-row-num {
+    font-family: var(--serif);
+    font-size: 0.8rem;
+    color: var(--muted);
+    padding-top: 0.3rem;
+  }
+
+  .service-row-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .service-row-desc {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--muted);
+  }
+
+  .service-row-tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--light);
+    border: 1px solid rgba(13,13,13,0.15);
+    color: var(--muted);
+    padding: 0.4rem 0.8rem;
+    border-radius: 2px;
+    text-align: center;
+    align-self: start;
+    margin-top: 0.3rem;
+  }
+
+  .pricing-band {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5rem 2.5rem;
+    margin-top: 3rem;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .pricing-card {
+    background: rgba(245,240,232,0.05);
+    border: 1px solid rgba(245,240,232,0.1);
+    padding: 2.5rem;
+    border-radius: 4px;
+    position: relative;
+    transition: background 0.3s;
+    cursor: none;
+  }
+
+  .pricing-card.featured {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .pricing-card:hover:not(.featured) { background: rgba(245,240,232,0.1); }
+
+  .pricing-badge {
+    position: absolute; top: -1px; right: 1.5rem;
+    background: var(--gold);
+    color: var(--ink);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    font-weight: 500;
+  }
+
+  .pricing-plan {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+  }
+
+  .pricing-price {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+
+  .pricing-price sub { font-size: 1rem; }
+
+  .pricing-tagline {
+    font-size: 0.82rem;
+    opacity: 0.7;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(245,240,232,0.15);
+  }
+
+  .pricing-features { list-style: none; }
+
+  .pricing-features li {
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+    opacity: 0.85;
+  }
+
+  .pricing-features li::before { content: '→  '; color: var(--gold); }
+  .pricing-card.featured .pricing-features li::before { color: var(--paper); }
+
+  /* ========== CONTACT ========== */
+  #contact { padding-top: 70px; }
+
+  .contact-hero {
+    padding: 5rem 2.5rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .contact-left-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-left-title em { font-style: italic; color: var(--accent); }
+
+  .contact-left-desc {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 3rem;
+  }
+
+  .contact-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .contact-info-item {
+    display: flex; gap: 1rem; align-items: start;
+  }
+
+  .contact-info-icon {
+    width: 36px; height: 36px;
+    background: var(--light);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 0.1rem;
+  }
+
+  .contact-info-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .contact-info-value {
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .contact-form-wrap {
+    background: var(--light);
+    border-radius: 4px;
+    padding: 3rem;
+    border: 1px solid rgba(13,13,13,0.08);
+  }
+
+  .form-title {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+
+  .form-group { margin-bottom: 1.5rem; }
+
+  .form-label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid rgba(13,13,13,0.15);
+    border-radius: 2px;
+    padding: 0.9rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    border-color: var(--accent);
+  }
+
+  .form-textarea { resize: vertical; min-height: 120px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .submit-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    display: none;
+    border-left: 3px solid var(--accent);
+    z-index: 500;
+  }
+
+  .toast.show { display: block; animation: slideIn 0.3s ease; }
+
+  @keyframes slideIn {
+    from { transform: translateX(2rem); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4rem 2.5rem 2rem;
+  }
+
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid rgba(245,240,232,0.1);
+    margin-bottom: 2rem;
+  }
+
+  .footer-brand {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+  }
+
+  .footer-brand span { color: var(--accent); }
+
+  .footer-tagline {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    opacity: 0.5;
+    max-width: 280px;
+  }
+
+  .footer-col-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 1.2rem;
+  }
+
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .footer-links a {
+    font-size: 0.88rem;
+    opacity: 0.6;
+    text-decoration: none;
+    color: var(--paper);
+    cursor: none;
+    transition: opacity 0.2s;
+  }
+
+  .footer-links a:hover { opacity: 1; }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    opacity: 0.35;
+  }
+
+  /* Animation */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo" onclick="showPage('home')">Luminary<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#" onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a href="#" onclick="showPage('about')" id="nav-about">About</a></li>
+    <li><a href="#" onclick="showPage('services')" id="nav-services">Services</a></li>
+    <li><a href="#" onclick="showPage('contact')" id="nav-contact" class="nav-cta">Get Started</a></li>
+  </ul>
+</nav>
+
+<!-- ===== HOME ===== -->
+<section id="home" class="active">
+  <div class="hero">
+    <div class="hero-left fade-in visible">
+      <div class="hero-eyebrow">Creative AI Studio</div>
+      <h1 class="hero-title">We design<br><em>futures</em><br>that matter.</h1>
+      <p class="hero-desc">Luminary is an AI-powered creative studio blending strategy, design, and technology to help brands transcend the ordinary.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showPage('services')">Our Services</button>
+        <button class="btn-ghost" onclick="showPage('about')">Our Story</button>
+      </div>
+    </div>
+    <div class="hero-right fade-in visible">
+      <div class="hero-visual-main">
+        <div class="hero-visual-text">L</div>
+        <div class="hero-visual-badge">Est. 2021</div>
+      </div>
+      <div class="hero-visual-row">
+        <div class="hero-card-small">
+          <div class="num">200+</div>
+          <div class="label">Projects Delivered</div>
+        </div>
+        <div class="hero-card-small">
+          <div class="num">98%</div>
+          <div class="label">Client Satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item">Brand Identity</span>
+      <span class="marquee-item">UX Design</span>
+      <span class="marquee-item">AI Campaigns</span>
+      <span class="marquee-item">Motion Design</span>
+      <span class="marquee-item">Strategy</span>
+      <span class="marquee-item">Web Experiences</span>
+      <span class="marquee-item">Brand Identity</span>
+      <span class="marquee-item">UX Design</span>
+      <span class="marquee-item">AI Campaigns</span>
+      <span class="marquee-item">Motion Design</span>
+      <span class="marquee-item">Strategy</span>
+      <span class="marquee-item">Web Experiences</span>
+    </div>
+  </div>
+
+  <div class="services-preview">
+    <div class="section-header">
+      <div>
+        <div class="section-label">What We Do</div>
+        <h2 class="section-title">Capabilities built<br>for tomorrow</h2>
+      </div>
+      <button class="btn-ghost" onclick="showPage('services')">View all services →</button>
+    </div>
+    <div class="service-grid">
+      <div class="service-card">
+        <div class="service-num">01</div>
+        <div class="service-title">Brand Strategy & Identity</div>
+        <p class="service-desc">We architect brand systems that resonate deeply — from positioning to visual language.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">02</div>
+        <div class="service-title">AI-Powered Campaigns</div>
+        <p class="service-desc">Hyper-personalized campaigns using generative AI for scale without sacrificing soul.</p>
+      </div>
+      <div class="service-card">
+        <div class="service-num">03</div>
+        <div class="service-title">Digital Experience Design</div>
+        <p class="service-desc">Interfaces that feel inevitable — where every pixel earns its place on screen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <div class="about-hero">
+    <div class="about-hero-tag">About Luminary</div>
+    <h1 class="about-hero-title">Born from the belief that <em>great design</em> changes everything.</h1>
+  </div>
+
+  <div class="about-intro-row">
+    <div class="about-intro-left">
+      <p class="big-text fade-in">"We started Luminary because we were tired of beautiful work that didn't move the needle — and effective work that forgot to be beautiful."</p>
+    </div>
+    <div class="about-intro-right">
+      <p>Founded in 2021 by three creatives who met at a design residency in Lisbon, Luminary has grown from a scrappy three-person studio into a 24-strong team with clients across four continents.</p>
+      <p>We live at the intersection of craft and technology. Every project is approached as an opportunity to push the boundaries of what's possible while staying deeply connected to what matters most — the human on the other side of the screen.</p>
+      <p>Our work spans brand identities, campaign systems, interactive platforms, and editorial design. What ties it all together is a relentless curiosity and an obsession with the details most studios overlook.</p>
+    </div>
+  </div>
+
+  <div class="values-row">
+    <div class="value-item fade-in">
+      <div class="value-icon">⬡</div>
+      <div class="value-title">Honesty First</div>
+      <p class="value-desc">We tell clients what they need to hear, not what they want. Trust is the foundation of every relationship.</p>
+    </div>
+    <div class="value-item fade-in">
+      <div class="value-icon">◈</div>
+      <div class="value-title">Craft Over Speed</div>
+      <p class="value-desc">We move thoughtfully. Rushing great work is an oxymoron — the details matter, always.</p>
+    </div>
+    <div class="value-item fade-in">
+      <div class="value-icon">◎</div>
+      <div class="value-title">Curiosity Always</div>
+      <p class="value-desc">We stay students. New tools, new perspectives, new ways of seeing — we actively seek them out.</p>
+    </div>
+    <div class="value-item fade-in">
+      <div class="value-icon">◇</div>
+      <div class="value-title">Impact Over Awards</div>
+      <p class="value-desc">We'd rather change behavior than win trophies. Real-world results are the only metric we care about.</p>
+    </div>
+  </div>
+
+  <div class="team-section">
+    <div class="section-label">The Team</div>
+    <h2 class="section-title">The people behind the work</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar a1">SK</div>
+        <div class="team-info">
+          <div class="team-name">Sophia Kiran</div>
+          <div class="team-role">Co-founder & Creative Director</div>
+          <p class="team-bio">Ex-Pentagram. Believes that the best design is felt before it's understood. Collects vintage type specimens and strong opinions.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar a2">MV</div>
+        <div class="team-info">
+          <div class="team-name">Marcus Vidal</div>
+          <div class="team-role">Co-founder & Head of Strategy</div>
+          <p class="team-bio">Spent eight years at McKinsey before realizing strategy without aesthetics is just a spreadsheet. Now he refuses to separate the two.</p>
+        </div>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar a3">RL</div>
+        <div class="team-info">
+          <div class="team-name">Riko Lim</div>
+          <div class="team-role">Co-founder & Technology Lead</div>
+          <p class="team-bio">Writes code the way poets write verses — with rhythm and restraint. Obsessed with the space where AI and human creativity collide.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section id="services">
+  <div class="services-hero">
+    <div>
+      <div class="section-label">Services</div>
+      <h1 class="services-hero-title">Work that <em>earns</em> its<br>place in the world</h1>
+    </div>
+    <p class="services-hero-text">From brand foundations to full-stack digital experiences, we offer a focused set of capabilities that we've spent years perfecting. We don't do everything. We do these things extraordinarily well.</p>
+  </div>
+
+  <div class="service-list">
+    <div class="service-row fade-in">
+      <div class="service-row-num">01</div>
+      <div class="service-row-title">Brand Strategy & Identity</div>
+      <div class="service-row-desc">Comprehensive brand architecture from core positioning and messaging to full visual identity systems. Logos, typography, color, photography direction, and detailed usage guidelines for every touchpoint.</div>
+      <div class="service-row-tag">Foundation</div>
+    </div>
+    <div class="service-row fade-in">
+      <div class="service-row-num">02</div>
+      <div class="service-row-title">AI Campaign Systems</div>
+      <div class="service-row-desc">Generative AI integrated into campaign pipelines — allowing for thousands of on-brand variations, hyper-targeted creative, and adaptive storytelling at unprecedented scale without losing the human heart of the message.</div>
+      <div class="service-row-tag">AI-Native</div>
+    </div>
+    <div class="service-row fade-in">
+      <div class="service-row-num">03</div>
+      <div class="service-row-title">Digital Experience Design</div>
+      <div class="service-row-desc">End-to-end UX and UI for web platforms, apps, and interactive installations. We prototype early, test often, and obsess over the micro-interactions that separate good from unforgettable.</div>
+      <div class="service-row-tag">Experience</div>
+    </div>
+    <div class="service-row fade-in">
+      <div class="service-row-num">04</div>
+      <div class="service-row-title">Editorial & Content Design</div>
+      <div class="service-row-desc">Annual reports, brand magazines, editorial systems, and content strategy. We believe that how information is designed determines whether it's read, remembered, and acted upon.</div>
+      <div class="service-row-tag">Editorial</div>
+    </div>
+    <div class="service-row fade-in">
+      <div class="service-row-num">05</div>
+      <div class="service-row-title">Motion & Spatial Design</div>
+      <div class="service-row-desc">Brand motion language, title sequences, environmental graphics, and spatial installations. We bring brands to life in dimensions that static design simply cannot reach.</div>
+      <div class="service-row-tag">Motion</div>
+    </div>
+  </div>
+
+  <div class="pricing-band">
+    <div class="section-label" style="color: var(--gold);">Pricing</div>
+    <h2 class="section-title" style="color: var(--paper);">Transparent, honest investment</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-plan">Starter</div>
+        <div class="pricing-price"><sub>$</sub>4,500</div>
+        <div class="pricing-tagline">Per project — ideal for focused engagements</div>
+        <ul class="pricing-features">
+          <li>Brand mark + basic guidelines</li>
+          <li>2-week turnaround</li>
+          <li>2 rounds of revision</li>
+          <li>Print-ready files included</li>
+        </ul>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Most Popular</div>
+        <div class="pricing-plan">Studio</div>
+        <div class="pricing-price"><sub>$</sub>18,000</div>
+        <div class="pricing-tagline">Full brand system — our most requested scope</div>
+        <ul class="pricing-features">
+          <li>Full identity system</li>
+          <li>Brand strategy included</li>
+          <li>Digital experience design</li>
+          <li>Unlimited revisions</li>
+          <li>3-month support period</li>
+        </ul>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-plan">Partner</div>
+        <div class="pricing-price">Custom</div>
+        <div class="pricing-tagline">For complex, multi-channel engagements</div>
+        <ul class="pricing-features">
+          <li>Everything in Studio</li>
+          <li>AI campaign systems</li>
+          <li>Embedded team member</li>
+          <li>Priority response SLA</li>
+          <li>Quarterly brand audits</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="contact-hero">
+    <div>
+      <div class="section-label">Contact</div>
+      <h1 class="contact-left-title">Let's build something <em>extraordinary</em> together.</h1>
+      <p class="contact-left-desc">We take on a small number of new projects each quarter to ensure every client gets the full depth of our attention. If you're considering working with us, reach out early.</p>
+
+      <div class="contact-info-row">
+        <div class="contact-info-item">
+          <div class="contact-info-icon">✉</div>
+          <div>
+            <div class="contact-info-label">Email</div>
+            <div class="contact-info-value">hello@luminary.studio</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">◎</div>
+          <div>
+            <div class="contact-info-label">Studio</div>
+            <div class="contact-info-value">Lisbon, PT · Remote-first</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">◷</div>
+          <div>
+            <div class="contact-info-label">Response Time</div>
+            <div class="contact-info-value">Within 24 hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form-wrap">
+      <div class="form-title">Tell us about your project</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" placeholder="Sophie" id="fname">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" placeholder="Kiran" id="lname">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" placeholder="you@company.com" id="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service Interested In</label>
+        <select class="form-select" id="service">
+          <option value="">Select a service</option>
+          <option>Brand Strategy & Identity</option>
+          <option>AI Campaign Systems</option>
+          <option>Digital Experience Design</option>
+          <option>Editorial & Content Design</option>
+          <option>Motion & Spatial Design</option>
+          <option>Not sure yet — let's talk</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tell us about your project</label>
+        <textarea class="form-textarea" id="message" placeholder="What are you trying to achieve? What's the timeline? Any context that would help us understand your world..."></textarea>
+      </div>
+      <button class="btn-primary" style="width: 100%;" onclick="submitForm()">Send Message →</button>
+      <p class="submit-note">We reply within 24 hours. No spam, ever.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">Luminary<span>.</span></div>
+      <p class="footer-tagline">An AI-powered creative studio designing brands, experiences, and futures that matter.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigate</div>
+      <ul class="footer-links">
+        <li><a href="#" onclick="showPage('home')">Home</a></li>
+        <li><a href="#" onclick="showPage('about')">About</a></li>
+        <li><a href="#" onclick="showPage('services')">Services</a></li>
+        <li><a href="#" onclick="showPage('contact')">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Services</div>
+      <ul class="footer-links">
+        <li><a href="#" onclick="showPage('services')">Brand Identity</a></li>
+        <li><a href="#" onclick="showPage('services')">AI Campaigns</a></li>
+        <li><a href="#" onclick="showPage('services')">UX Design</a></li>
+        <li><a href="#" onclick="showPage('services')">Motion Design</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Connect</div>
+      <ul class="footer-links">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Dribbble</a></li>
+        <li><a href="#">Behance</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Luminary Studio. All rights reserved.</span>
+    <span>Lisbon, Portugal</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast">✓ Message sent! We'll be in touch within 24 hours.</div>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 5 + 'px';
+    cursor.style.top = my - 5 + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx - 18) * 0.18;
+    ry += (my - ry - 18) * 0.18;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('[onclick], button, a').forEach(el => {
+    el.addEventListener('mouseenter', () => { ring.style.transform = 'scale(1.6)'; cursor.style.transform = 'scale(0.5)'; });
+    el.addEventListener('mouseleave', () => { ring.style.transform = 'scale(1)'; cursor.style.transform = 'scale(1)'; });
+  });
+
+  function showPage(page) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+    const navEl = document.getElementById('nav-' + page);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    setTimeout(() => {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight) el.classList.add('visible');
+      });
+    }, 100);
+
+    return false;
+  }
+
+  window.addEventListener('scroll', () => {
+    document.querySelectorAll('.fade-in').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 60) el.classList.add('visible');
+    });
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll('.fade-in').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) el.classList.add('visible');
+    });
+  }, 200);
+
+  function submitForm() {
+    const email = document.getElementById('email').value.trim();
+    const message = document.getElementById('message').value.trim();
+    if (!email || !message) {
+      alert('Please fill in at least your email and project description.');
+      return;
+    }
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 4000);
+    document.getElementById('fname').value = '';
+    document.getElementById('lname').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('service').value = '';
+    document.getElementById('message').value = '';
+  }
+</script>
+</body>
+</html>
